@@ -1,4 +1,11 @@
 [basic]
 url = "http://www.google.com"
-N = 10                             # Number of trials to run for benchmarking
-K = 100                            # Number of requests per trial
+N = 10                        # Number of trials to run for benchmarking
+K = 100                       # Number of requests per trial
+
+
+[threading]
+num_threads = 20              # Number of threads to use for benchmarking
+url = "http://www.google.com"
+N = 20                        # Number of trials to run for benchmarking
+K = 300                       # Number of requests per trial

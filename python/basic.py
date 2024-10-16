@@ -1,30 +1,33 @@
+from typing import List
 import requests
-import toml
-import os
 import time
+from utils import ResultTimes
 
-ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-# read in config.toml
-with open(os.path.join(ROOT_DIR, 'config.toml')) as f:
-    config = toml.load(f)
+def run_basic(config) -> List[ResultTimes]:
+    url = config['basic']['url']
+    N = config['basic']['N']
+    K = config['basic']['K']
     
-url = config['basic']['url']
-N = config['basic']['N']
-K = config['basic']['K']
-
-max_time = 0
-avg_times = []
-for i in range(N):
-    trial_time = 0
-    for j in range(K):
-        start = time.time()
-        response = requests.get(url)
-        end = time.time()
-        cur_time = end - start
-        max_time = max(max_time, cur_time)
-        trial_time += cur_time
-    avg_times.append(trial_time / K)
-    print(f"Trial {i+1}: {trial_time} seconds")
+    max_time = 0
+    results = []
+    for i in range(N):
+        trial_time = 0
+        for j in range(K):
+            start = time.time()
+            _ = requests.get(url)
+            end = time.time()
+            cur_time = end - start
+            max_time = max(max_time, cur_time)
+            trial_time += cur_time
+        result = ResultTimes("basic", url, K, 1, max_time, trial_time / K)
+        results.append(result)
+        print(f"Trial {i+1}: {trial_time} seconds")
+    return results
     
-print(f"Max time: {max_time}")
-print(f"Avg Times: {avg_times}")
+if __name__ == '__main__':
+    results = run_basic()
+    avg_times = [result.average_time for result in results]
+    max_time = max(result.max_time for result in results)
+    
+    print(f"Max time: {max_time}")
+    print(f"Avg Times: {avg_times}")
