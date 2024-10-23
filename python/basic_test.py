@@ -1,6 +1,6 @@
 from typing import List
 import requests
-import time
+from time import perf_counter
 from utils import ResultTimes
 
 def run_basic(config) -> List[ResultTimes]:
@@ -13,19 +13,24 @@ def run_basic(config) -> List[ResultTimes]:
     for i in range(N):
         trial_time = 0
         for j in range(K):
-            start = time.time()
+            start = perf_counter()
             _ = requests.get(url)
-            end = time.time()
+            end = perf_counter()
             cur_time = end - start
             max_time = max(max_time, cur_time)
             trial_time += cur_time
         result = ResultTimes("basic", url, K, 1, max_time, trial_time / K)
         results.append(result)
-        print(f"Trial {i+1}: {trial_time} seconds")
     return results
     
 if __name__ == '__main__':
-    results = run_basic()
+    import os
+    import toml
+    from utils import ROOT_DIR
+    with open(os.path.join(ROOT_DIR, 'config.toml')) as f:
+        config = toml.load(f)
+        
+    results = run_basic(config)
     avg_times = [result.average_time for result in results]
     max_time = max(result.max_time for result in results)
     
